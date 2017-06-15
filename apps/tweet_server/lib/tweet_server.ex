@@ -1,18 +1,13 @@
 defmodule TweetServer do
-  @moduledoc """
-  Documentation for TweetServer.
-  """
+  use GenServer
 
-  @doc """
-  Hello world.
+  # Client APIs.
+  def start_link do
+    GenServer.start_link(__MODULE__, :ok, [])
+  end
 
-  ## Examples
-
-      iex> TweetServer.hello
-      :world
-
-  """
-  def hello do
-    :world
+  # Server APIs.
+  def init(:ok) do
+    {:ok, []}
   end
 end
