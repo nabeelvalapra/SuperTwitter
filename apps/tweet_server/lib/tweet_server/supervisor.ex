@@ -7,9 +7,9 @@ defmodule TweetServer.Supervisor do
   
   def init(:ok) do
     children = [
+      supervisor(Task.Supervisor, [[name: TweetServer.TaskSupervisor]]),
     ]
-    opts = [strategy: :one_for_one, name: TweetServer.Supervisor]
-
+    opts = [strategy: :one_for_one]
     supervise(children, opts)
   end
 end
