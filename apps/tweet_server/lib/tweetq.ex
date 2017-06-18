@@ -31,10 +31,10 @@ defmodule TweetServer.TweetQ do
 
   def handle_call({:pop}, _from, queue) do
     case :queue.out(queue) do
-      {{:value, item}, queue} -> 
-        {:reply, item, queue}
+      {{:value, %{:p_id => pid, :tweet => tweet}}, queue} -> 
+        {:reply, %{:p_id => pid, :tweet => tweet}, queue}
       {:empty, queue} ->
-        {:reply, nil, queue}
+        {:reply, {:empty} , queue}
     end  
   end
 

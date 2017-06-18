@@ -6,7 +6,9 @@ defmodule TweetServer.Application do
     
     children = [
       supervisor(TweetServer.Fetchr.Supervisor, []),
+      supervisor(Task.Supervisor, [[name: TweetServer.WorkerSupervisor]]),
       worker(TweetServer.TweetQ, []),
+      worker(Task, [TweetServer.Worker, :start_process, [Worker1]]),
     ]
     opts = [strategy: :one_for_one, name: TweetServer.Supervisor]
     Supervisor.start_link(children, opts)
