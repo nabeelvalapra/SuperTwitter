@@ -1,4 +1,4 @@
-defmodule TweetQ do 
+defmodule TweetServer.TweetQ do 
   use GenServer
 
   # Client API.
