@@ -14,6 +14,10 @@ defmodule TweetServer.TweetQ do
     GenServer.call(__MODULE__, {:pop})
   end
 
+  def count do
+    GenServer.call(__MODULE__, {:count})
+  end
+
   # Server API.
   def init([]) do
     queue = :queue.new
@@ -26,7 +30,15 @@ defmodule TweetServer.TweetQ do
   end
 
   def handle_call({:pop}, _from, queue) do
-    {{:value, item}, queue} = :queue.out(queue)
-    {:reply, item, queue}
+    case :queue.out(queue) do
+      {{:value, item}, queue} -> 
+        {:reply, item, queue}
+      {:empty, queue} ->
+        {:reply, nil, queue}
+    end  
+  end
+
+  def handle_call({:count}, _from, queue) do
+    {:reply, :queue.len(queue), queue}
   end
 end

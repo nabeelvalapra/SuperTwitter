@@ -1,5 +1,6 @@
 defmodule TweetServer.Fetchr do
   use GenServer
+  alias TweetServer.TweetQ
 
   @consumer_key Application.get_env(:tweet_server, :consumer_key)
   @consumer_secret Application.get_env(:tweet_server, :consumer_secret)
@@ -37,11 +38,10 @@ defmodule TweetServer.Fetchr do
     tweets = ExTwitter.search(hashtag, [max_id: max_id]) 
     case Enum.count(tweets) do
       x when x in [0, 1] ->
-        IO.puts "I'm done!!"
+        {:ok}
       _ ->
-        Enum.map(tweets, fn tweet -> tweet.text end)
-          |> Enum.join("\n")
-          |> IO.puts
+        Enum.map tweets, fn tweet -> TweetQ.append %{:p_id => self(), :tweet => tweet} end
+        IO.puts TweetQ.count
         fetch_loop(hashtag, List.last(tweets).id_str)
     end
   end
