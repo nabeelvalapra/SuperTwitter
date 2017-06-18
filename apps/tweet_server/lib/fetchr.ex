@@ -24,13 +24,25 @@ defmodule TweetServer.Fetchr do
   end
 
   def handle_info({:fetch, hashtag}, state) do
-    tweets = ExTwitter.search(hashtag)
-    IO.inspect tweets
+    fetch_loop(hashtag)
     {:noreply, state}
   end
 
   # Private Functions.
   defp fetch_tweets(hashtag) do
-    Process.send_after(self, {:fetch, hashtag}, 1000)
+    Process.send_after(self(), {:fetch, hashtag}, 1000)
+  end
+
+  defp fetch_loop(hashtag, max_id \\ nil) do 
+    tweets = ExTwitter.search(hashtag, [max_id: max_id]) 
+    case Enum.count(tweets) do
+      x when x in [0, 1] ->
+        IO.puts "I'm done!!"
+      _ ->
+        Enum.map(tweets, fn tweet -> tweet.text end)
+          |> Enum.join("\n")
+          |> IO.puts
+        fetch_loop(hashtag, List.last(tweets).id_str)
+    end
   end
 end
