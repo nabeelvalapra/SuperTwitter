@@ -6,7 +6,7 @@ defmodule TweetServer.Fetchr.Supervisor do
   end
 
   def start_fetchr(hashtag) do
-    Supervisor.start_child(__MODULE__, [])
+    Supervisor.start_child(__MODULE__, [[hashtag]])
   end
   
   def init(:ok) do

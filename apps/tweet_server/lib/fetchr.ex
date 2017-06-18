@@ -7,27 +7,30 @@ defmodule TweetServer.Fetchr do
   @access_token_secret Application.get_env(:tweet_server, :access_token_secret)
   
   # Client API.
-  def start_link do
-    GenServer.start_link(__MODULE__, [])
-  end
-
-  def fetch_tweets(pid, hashtag) do
-    GenServer.cast(pid, {:fetch, hashtag})
+  def start_link(hashtag) do
+    GenServer.start_link(__MODULE__, hashtag)
   end
 
   # Server API.
-  def init([]) do
+  def init(hashtag) do
     ExTwitter.configure(
       consumer_key: @consumer_key,
       consumer_secret: @consumer_secret,
       access_token: @access_token,
       access_token_secret: @access_token_secret
     )
-    {:ok, []}
+    fetch_tweets(hashtag)
+    {:ok, nil}
   end
 
-  def handle_cast({:fetch, hashtag}, state) do
+  def handle_info({:fetch, hashtag}, state) do
     tweets = ExTwitter.search(hashtag)
+    IO.inspect tweets
     {:noreply, state}
+  end
+
+  # Private Functions.
+  defp fetch_tweets(hashtag) do
+    Process.send_after(self, {:fetch, hashtag}, 1000)
   end
 end
