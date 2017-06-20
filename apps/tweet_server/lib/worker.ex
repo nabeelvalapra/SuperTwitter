@@ -1,19 +1,20 @@
 defmodule TweetServer.Worker do
   alias TweetServer.TweetQ
   
-  def start_process name do
-    Process.register self, name
-    process
+  def start_link(name, interval) do
+    Process.register(self(), name)
+    process(interval)
   end
 
-  def process do
-    case TweetQ.pop do
+  def process(interval) do
+    case TweetQ.pop() do
       {:empty} ->
         nil
-      %{:p_id => _, :tweet => tweet} -> 
-        IO.puts tweet.text
-        :timer.sleep(500)
+      %{:p_id => p_id, :tweet => tweet} -> 
+        Process.send(p_id, {:io_put, {TweetQ.count, tweet.text}}, [])
     end
-    process()
+
+    :timer.sleep(interval)
+    process(interval)
   end
 end

@@ -29,6 +29,11 @@ defmodule TweetServer.Fetchr do
     {:noreply, state}
   end
 
+  def handle_info({:io_put, data}, state) do
+    IO.inspect data
+    {:noreply, state}
+  end
+
   # Private Functions.
   defp fetch_tweets(hashtag) do
     Process.send_after(self(), {:fetch, hashtag}, 1000)
@@ -41,7 +46,6 @@ defmodule TweetServer.Fetchr do
         {:ok}
       _ ->
         Enum.map tweets, fn tweet -> TweetQ.append %{:p_id => self(), :tweet => tweet} end
-        IO.puts TweetQ.count
         fetch_loop(hashtag, List.last(tweets).id_str)
     end
   end
